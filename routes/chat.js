@@ -24,22 +24,38 @@ function cargarCatalogo() {
 // Buscar productos
 function buscarProductos(consulta) {
   const cat = cargarCatalogo();
-  const palabras = consulta.toLowerCase().split(' ');
+  const palabras = consulta.toLowerCase().split(/\s+/).filter(p => p.length > 2);
   
-  let productosIds = new Set();
+  let resultados = [];
   
-  // Buscar en índices
-  for (const [key, ids] of Object.entries(cat.indices.por_categoria)) {
-    if (palabras.some(p => key.toLowerCase().includes(p))) {
-      ids.forEach(id => productosIds.add(id));
+  // Buscar en TODOS los productos
+  cat.productos.forEach(prod => {
+    let score = 0;
+    
+    palabras.forEach(palabra => {
+      // Buscar en nombre (peso 3)
+      if (prod.nombre.toLowerCase().includes(palabra)) score += 3;
+      
+      // Buscar en keywords (peso 2)
+      if (prod.keywords && prod.keywords.some(k => k.includes(palabra))) score += 2;
+      
+      // Buscar en categoría (peso 2)
+      if (prod.categoria_principal.toLowerCase().includes(palabra)) score += 2;
+      
+      // Buscar en marca (peso 1)
+      if (prod.marca && prod.marca.toLowerCase().includes(palabra)) score += 1;
+    });
+    
+    if (score > 0) {
+      resultados.push({ ...prod, score });
     }
-  }
+  });
   
-  const productos = Array.from(productosIds)
-    .map(id => cat.productos[id])
+  console.log(`Búsqueda: "${consulta}" - Encontrados: ${resultados.length}`);
+  
+  return resultados
+    .sort((a, b) => b.score - a.score)
     .slice(0, 5);
-  
-  return productos;
 }
 
 // Endpoint principal
@@ -67,7 +83,12 @@ router.post('/chat', async (req, res) => {
           content: `Sos el asistente de NIMAT, materiales de construcción.
 Sos experto, amable y ayudás a encontrar productos.
 SIEMPRE mencioná precio y stock.
-Usá tono conversacional argentino.`
+Usá tono conversacional argentino.
+
+CRÍTICO: Si no encontrás productos en el catálogo que te doy, 
+decí honestamente "No encontré ese producto en nuestro catálogo actual. 
+Contactanos por WhatsApp para consultar disponibilidad."
+NO inventes productos o precios.`
         },
         {
           role: 'system',
