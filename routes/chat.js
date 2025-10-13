@@ -70,10 +70,13 @@ router.post('/chat', async (req, res) => {
     const productos = buscarProductos(mensaje);
     
     const contexto = productos.length > 0
-      ? productos.map(p => 
-          `- ${p.nombre}\n  Precio: ${p.precio_formateado}\n  Stock: ${p.stock}`
-        ).join('\n\n')
-      : 'No se encontraron productos exactos.';
+  ? productos.map(p => 
+      `- ${p.nombre}
+  SKU: ${p.sku}
+  PRECIO: $${p.precio.toLocaleString('es-AR')}
+  STOCK: ${p.stock} unidades disponibles`
+    ).join('\n\n')
+  : 'No se encontraron productos exactos.';
     
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
@@ -81,9 +84,14 @@ router.post('/chat', async (req, res) => {
         {
           role: 'system',
           content: `Sos el asistente de NIMAT, materiales de construcción.
-Sos experto, amable y ayudás a encontrar productos.
-SIEMPRE mencioná precio y stock.
-Usá tono conversacional argentino.`
+        Sos experto, amable y ayudás a encontrar productos.
+        REGLAS CRÍTICAS:
+        - SIEMPRE mencioná los PRECIOS que te doy en el catálogo
+        - SIEMPRE mencioná el STOCK disponible
+        - Si te paso productos, USÁ ESA INFORMACIÓN
+        - Sé específico con los números
+
+        Tono conversacional argentino.`
         },
         {
           role: 'system',
