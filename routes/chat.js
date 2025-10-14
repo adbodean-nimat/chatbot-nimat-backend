@@ -79,37 +79,39 @@ router.post('/chat', async (req, res) => {
   : 'No se encontraron productos exactos.';
     
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
-      messages: [
-        {
-          role: 'system',
-          content: `Sos el asistente de NIMAT, materiales de construcción.
-        Sos experto, amable y ayudás a encontrar productos.
-        REGLAS CRÍTICAS:
-        - SIEMPRE mencioná los PRECIOS que te doy en el catálogo
-        - SIEMPRE mencioná el STOCK disponible
-        - Si te paso productos, USÁ ESA INFORMACIÓN
-        - Sé específico con los números
+  model: 'gpt-4-turbo-preview',
+  messages: [
+    {
+      role: 'system',
+      content: `Sos el asistente de NIMAT, materiales de construcción.
 
-        Tono conversacional argentino.`
-        },
-        {
-          role: 'system',
-          content: `PRODUCTOS DISPONIBLES:\n${contexto}`
-        },
-        {
-          role: 'user',
-          content: mensaje
-        }
-      ],
-      temperature: 0.7,
-      max_tokens: 500
-    });
-    
-    res.json({
-      respuesta: completion.choices[0].message.content,
-      productos: productos.slice(0, 3)
-    });
+REGLAS CRÍTICAS:
+- SIEMPRE mencioná los PRECIOS que te doy
+- SIEMPRE mencioná el STOCK disponible
+- Usá la información del catálogo
+- Tono conversacional argentino.
+
+Respondé en formato JSON con esta estructura:
+{ "mensaje": "tu respuesta aquí", "productos_recomendados": ["SKU1", "SKU2"] }`
+    },
+    {
+      role: 'system',
+      content: `CATÁLOGO:\n${contexto}`
+    },
+    {
+      role: 'user',
+      content: mensaje
+    }
+  ],
+  temperature: 0.7,
+  max_tokens: 500,
+  response_format: { type: "json_object" } // Esto es lo nuevo
+});
+
+res.json({
+  respuesta: completion.choices[0].message.content,
+  productos: productos.slice(0, 3)
+  });
     
   } catch (error) {
     console.error('Error:', error);
