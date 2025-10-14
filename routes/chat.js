@@ -89,10 +89,7 @@ REGLAS CRÍTICAS:
 - SIEMPRE mencioná los PRECIOS que te doy
 - SIEMPRE mencioná el STOCK disponible
 - Usá la información del catálogo
-- Tono conversacional argentino.
-
-Respondé en formato JSON con esta estructura:
-{ "mensaje": "tu respuesta aquí", "productos_recomendados": ["SKU1", "SKU2"] }`
+- Tono conversacional argentino.`
     },
     {
       role: 'system',
@@ -105,7 +102,7 @@ Respondé en formato JSON con esta estructura:
   ],
   temperature: 0.7,
   max_tokens: 500,
-  response_format: { type: "json_object" } // Esto es lo nuevo
+  response_format: { type: "text" }
 });
 
 res.json({
