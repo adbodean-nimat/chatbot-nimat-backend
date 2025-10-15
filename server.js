@@ -16,6 +16,9 @@ app.get('/health', (req, res) => {
 const chatRouter = require('./routes/chat');
 app.use('/api', chatRouter);
 
+const productosRoutes = require('./routes/productos');
+app.use('/api', productosRoutes);
+
 app.listen(PORT, () => {
   console.log('Servidor en puerto', PORT);
 });
