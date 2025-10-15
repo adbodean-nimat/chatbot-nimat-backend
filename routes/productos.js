@@ -28,7 +28,7 @@ router.get('/productos', (req, res) => {
     res.json({
       metadata: catalogo.metadata,
       indices: catalogo.indices,
-      productos: catalogo.productos.filter(p => p.activo && p.visible)
+      productos: catalogo.productos
     });
     
   } catch (error) {
