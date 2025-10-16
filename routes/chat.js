@@ -236,7 +236,7 @@ Para consultas urgentes: ${datosEmpresa.contacto.whatsapp.link}`;
   
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4-turbo-preview',
+      model: 'gpt-4o-mini',
       messages: mensajes,
       temperature: 0.7,
       max_tokens: 500
@@ -289,7 +289,7 @@ router.post('/chat', async (req, res) => {
     
     res.json({
       respuesta: respuesta,
-      productos: productosRelevantes.slice(0, 3), // Top 3 para mostrar
+      // productos: productosRelevantes.slice(0, 3), // Top 3 para mostrar
       timestamp: new Date().toISOString()
     });
     
